@@ -299,7 +299,8 @@ SortableTable.prototype.getCache = function (sType, nRow, nColumn) {
 		var r = [];
 		for (var j = 0; j < this.step; j++) { r.push(rows[i + j]); }
 		a.push({
-			value:		this.getRowValue(r[nRow], sType, nColumn),
+			
+			value:		this.getRowValue(r[0], sType, nColumn),
 			elements:	r
 		});
 	};
