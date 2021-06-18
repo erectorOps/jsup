@@ -109,7 +109,7 @@ FilterableTable.prototype.attachFilter = function ()
 			  continue;
 			}
 
-			var c = this.filterRows[i];
+			var c = this.filterRows.children[i];
 
 
 			var text = document.createElement('INPUT');
