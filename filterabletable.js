@@ -280,7 +280,7 @@ FilterableTable.prototype.filter = function (e) {
 			// Apply the filter
 			for (var i = 0; i < this.tBody.children.length; i += this.step) {
 				if (hideRows[i]) { continue; }
-				let row = this.tBody.children[i + r];
+				let row = this.tBody.children[i];
 				let cell = row.children[n];
 				let text = this.getInnerText(cell).toLowerCase();
 				if (row.className != 'noFilter') {
