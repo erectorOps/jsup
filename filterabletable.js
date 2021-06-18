@@ -156,6 +156,7 @@ FilterableTable.prototype.hasFilter = function(row, column)
 // Fills the filters for columns which are not fiiltered
 FilterableTable.prototype.fillFilters = function ()
 {
+	var row = 0;
 	for (var column = 0; column < this.filterRows.cells.length; column++) {
 		if (this.hasFilter(row, column) && !this.inFilter(row, column)) {
 			this.buildFilter(row, column, {'(all)':true});
