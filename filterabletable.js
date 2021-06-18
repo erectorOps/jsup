@@ -192,7 +192,7 @@ FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValu
 
 	// put all relevant strings in the values array.
 	for (var i = 0; i < this.tBody.children.length; i += this.step) {
-		var r = this.tBody.children[i + rowIndex];
+		var r = this.tBody.children[i];
 		if (r.style.display != 'none' && r.className != 'noFilter') {
 			values.push(this.getInnerText(r.children[columnIndex]));
 		}
