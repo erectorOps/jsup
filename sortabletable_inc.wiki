@@ -1,0 +1,48 @@
+#javascript(){{{
+<script defer charset="utf-8" type="text/javascript" src="https://img.atwikiimg.com/www65.atwiki.jp/myrenshu/pub/js/filterabletable.js"></script>
+<script defer charset="utf-8" type="text/javascript" src="https://img.atwikiimg.com/www65.atwiki.jp/myrenshu/pub/js/sortabletable.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+  
+  let sortabletable_main = function(table_id, table_html, sortabletableso, filter) {
+    table_html.attr('id', table_id);
+    let tableid = table_html[0];
+    let st = new SortableTable(tableid, sortabletableso);
+    if (filter) {
+      let ft = new FilterableTable(tableid);
+    }
+  };
+
+  // parse 'Sort' argument
+  $('.sortabletable').each(function(index, element) {
+    let sortabletableso, filter, table_id;
+    let option = [];
+    let args = $('.option:first', element);
+    if (args.length !== 0) {
+      option = args.text().trim().split(',');
+      args.remove();
+    }
+    if (option.length >= 1) {
+      sortabletableso = option[0].split('|').map(x => x.trim());
+    } else {
+      let cols = $('tr:first td', element).length;
+      sortabletableso = Array(cols).fill().map(x => "String");
+    }
+    
+    if (option.length >= 2 && option[1].trim() == '1') {
+      filter = 1;
+    } else {
+      filter = 0;
+    }
+    
+    if (option.length >= 3 && option[2] !== "") {
+      table_id = option[2] + index;
+    } else {
+      table_id = 'sortabletable' + index;
+    }
+    
+    sortabletable_main(table_id, $('table:first', element), sortabletableso, filter);
+  });
+});
+</script>
+}}}
