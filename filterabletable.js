@@ -84,26 +84,33 @@ FilterableTable.prototype.attachFilter = function ()
 		for (var i = 0; i < this.tHead.rows[j].cells.length; i++) {
       let sortType = this.sortTypes[index++] || 'None';
 			var cell = this.tHead.rows[j].cells[i];
-			var c = document.createElement('TH');
-			
-  		for (let n = 0, len = cell.classList.length; n < len; n++) {
-  		  if (cell.classList[n].indexOf('table_filter_') !== -1) {
-  		    c.className = cell.classList[n];
-  		    break;
-  		  }
-  		}
-  		if (cell.style.display) {
-  		  c.style.display = cell.style.display;
-  		}
-  		
-			
-			c.rowSpan = cell.rowSpan;
-			c.colSpan = cell.colSpan;
+
+			if (j == 0) {
+				var c = document.createElement('TH');
+				
+				for (let n = 0, len = cell.classList.length; n < len; n++) {
+					if (cell.classList[n].indexOf('table_filter_') !== -1) {
+						c.className = cell.classList[n];
+						break;
+					}
+				}
+				if (cell.style.display) {
+					c.style.display = cell.style.display;
+				}
+				
+				
+				c.rowSpan = cell.rowSpan;
+				c.colSpan = cell.colSpan;
+
+				this.filterRows.appendChild(c);
+			}
 			
 			if (sortType === 'None' || this.filterObjects[i]) {
 			  continue;
 			}
-			this.filterRows.appendChild(c);
+
+			var c = this.filterRows[i];
+
 
 			var text = document.createElement('INPUT');
 			text.className = 'filter-box';
