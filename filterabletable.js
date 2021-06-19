@@ -284,7 +284,7 @@ FilterableTable.prototype.filter = function (e) {
 					for (let ci = 0; ci < sel.value.length; ci++) {
 						const c = sel.value[ci];
 						if (c == '<' || c == '>' || c == '=') {
-							op += ci;
+							op += c;
 						} else if (0 < op.length) {
 							if ((ci - op.length) == 0 && (op+'x' in FilterableTable.compare_op)) {
 								compare_value = parseFloat(sel.value.substring(op.length));
