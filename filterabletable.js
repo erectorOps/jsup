@@ -334,7 +334,7 @@ FilterableTable.prototype.filter = function (e) {
 					}
 					else if (obj.value) {
 						if (!obj.compare(obj.value, parseFloat(text))) {
-							hideRow[i] = true;
+							hideRows[i] = true;
 						}
 					}
 					else {
