@@ -61,7 +61,7 @@ FilterableTable.prototype.detachFilter = function ()
 
 	// Remove the filter
 	this.showAll();
-	for (let row = 0; row < this.filterRows.length; row++) {
+	for (var row = 0; row < this.filterRows.length; row++) {
 		this.tHead.removeChild(this.filterRows[row]);
 	}
 	this.filterEnabled = false;
@@ -79,23 +79,30 @@ FilterableTable.prototype.attachFilter = function ()
 	this.step = 1;
 	this.hrowCount = this.tHead.rows.length;
 	this.filterRows = new Array();
-	for (let i = 0; i < this.hrowCount; i++) {
+	for (var i = 0; i < this.hrowCount; i++) {
 		this.filterRows[i] = this.tHead.insertRow(this.tHead.rows.length);
 	}
 
 	this.filterObjects = new Array();
-	let index = 0;
+	var index = 0;
+
+	var fullColumnCount = Array.prototype.slice.call(this.tHead.rows[0].cells).map(x => x.colSpan).reduce((a, c) => a + c);
+
+	const spanFlag = new Array(this.hrowCount);
+	for (var i = 0; i < this.hrowCount; i++)
+	{
+		spanFlag[i] = new Array(fullColumnCount);
+		spanFlag[i].fill(0);
+	}
 
 	for (var j = 0; j < this.hrowCount; j++) {
 		var row = new Array();
-		for (var i = 0, i2 = 0; i < this.tHead.rows[j].cells.length; i++) {
-
-      let sortType = this.sortTypes[index++] || 'None';
+		for (var i = 0, fi = 0; i < this.tHead.rows[j].cells.length; i++) {
+      var sortType = this.sortTypes[index++] || 'None';
 			var cell = this.tHead.rows[j].cells[i];
-
 			var c = document.createElement('TH');
-				
-			for (let n = 0, len = cell.classList.length; n < len; n++) {
+			for (var n = 0, len = cell.classList.length; n < len; n++) {
+
 				if (cell.classList[n].indexOf('table_filter_') !== -1) {
 					c.className = cell.classList[n];
 					break;
@@ -109,7 +116,16 @@ FilterableTable.prototype.attachFilter = function ()
 			c.colSpan = cell.colSpan;
 			this.filterRows[j].appendChild(c);
 
+			for (var y = 0; y < c.rowSpan; y++)
+			{
+				for (var x = 0; x < c.colSpan; x++)
+				{
+					spanFlag[j + y][fi + x] |= 1;
+				}
+			}
+
 			if (sortType === 'None') {
+				fi += c.colSpan;
 				continue;
 			}
 
@@ -144,7 +160,8 @@ FilterableTable.prototype.attachFilter = function ()
 			}
 
 			c.appendChild(opt);
-			row[i] = {columnIndex: i, rowIndex: j, opt: opt, text: text, filter: {}, regexp: false, enable: false};
+			row[i] = {columnIndex: i, rowIndex: j, opt: opt, text: text, filter: {}, regexp: false, enable: false, fullColumnIndex: fi};
+			fi += c.colSpan;
 		}
 		this.filterObjects[j] = row;
 	}
@@ -198,7 +215,7 @@ FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValu
 	for (var i = 0; i < this.tBody.children.length; i += this.step) {
 		var r = this.tBody.children[i];
 		if (r.style.display != 'none' && r.className != 'noFilter') {
-			values.push(this.getInnerText(r.children[columnIndex]));
+			values.push(this.getInnerText(r.children[filterObject.fullColumnIndex]));
 		}
 	}
 	values.sort();
@@ -293,9 +310,9 @@ FilterableTable.prototype.filter = function (e) {
 			// Apply the filter
 			for (var i = 0; i < this.tBody.children.length; i += this.step) {
 				if (hideRows[i]) { continue; }
-				let row = this.tBody.children[i];
-				let cell = row.children[n];
-				let text = this.getInnerText(cell).toLowerCase();
+				var row = this.tBody.children[i];
+				var cell = row.children[obj.fullColumnIndex];
+				var text = this.getInnerText(cell).toLowerCase();
 				if (row.className != 'noFilter') {
 					if (obj.regexp) {
 						if (! text.match(obj.regexp)) {
