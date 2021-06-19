@@ -8,7 +8,7 @@
 |-----------------------------------------------------------------------------|
 | Created 2005-07-27 | All changes are in the log above. | Updated 2006-09-05 |
 \----------------------------------------------------------------------------*/
-function FilterableTable(oTable, oSortTypes)
+function FilterableTable(oTable, oSortTypes, bMultipleTHead)
 {
 	while (oTable.tagName.toUpperCase() != 'TABLE') {
 		oTable = oTable.parentNode;
@@ -17,6 +17,7 @@ function FilterableTable(oTable, oSortTypes)
 	this.table = oTable;
 	this.tHead = oTable.tHead;
 	this.tBody = oTable.tBodies[0];
+	this.bMultipleTHead = bMultipleTHead || false;
 	this.document = oTable.ownerDocument || oTable.document;
 	var oThis = this;
 	this._optChange = function (e) {
@@ -75,22 +76,17 @@ FilterableTable.prototype.attachFilter = function ()
 	if (this.table.style.display == 'none') { return; }
 
 	// Insert the filterrow and add cells whith drowdowns.
-
-	this.step = 1;
-	this.hrowCount = this.tHead.rows.length;
 	this.filterRows = new Array();
+	this.hrowCount = this.tHead.rows.length;
+	this.step = this.bMultipleTHead ? 1 : this.hrowCount;
 	for (var i = 0; i < this.hrowCount; i++) {
 		this.filterRows[i] = this.tHead.insertRow(this.tHead.rows.length);
 	}
-
 	this.filterObjects = new Array();
 	var index = 0;
-
 	var fullColumnCount = Array.prototype.slice.call(this.tHead.rows[0].cells).map(x => x.colSpan).reduce((a, c) => a + c);
-
 	const spanFlag = new Array(this.hrowCount);
-	for (var i = 0; i < this.hrowCount; i++)
-	{
+	for (var i = 0; i < this.hrowCount; i++) {
 		spanFlag[i] = new Array(fullColumnCount);
 		spanFlag[i].fill(0);
 	}
@@ -99,12 +95,12 @@ FilterableTable.prototype.attachFilter = function ()
 		var row = new Array();
 		for (var i = 0, fi = 0; i < this.tHead.rows[j].cells.length; i++) {
 			for (; fi < fullColumnCount && spanFlag[j][fi] !== 0; fi++) ;
-      var sortType = this.sortTypes[index++] || 'None';
+			var sortType = this.sortTypes[index++] || 'None';
 			var cell = this.tHead.rows[j].cells[i];
 			var c = document.createElement('TH');
+			
 			for (var n = 0, len = cell.classList.length; n < len; n++) {
-
-				if (cell.classList[n].indexOf('table_filter_') !== -1) {
+n				if (cell.classList[n].indexOf('table_filter_') !== -1) {
 					c.className = cell.classList[n];
 					break;
 				}
@@ -113,14 +109,13 @@ FilterableTable.prototype.attachFilter = function ()
 				c.style.display = cell.style.display;
 			}
 
+
 			c.rowSpan = cell.rowSpan;
 			c.colSpan = cell.colSpan;
 			this.filterRows[j].appendChild(c);
 
-			for (var y = 0; y < c.rowSpan; y++)
-			{
-				for (var x = 0; x < c.colSpan; x++)
-				{
+			for (var y = 0; y < c.rowSpan; y++) {
+				for (var x = 0; x < c.colSpan; x++) {
 					spanFlag[j + y][fi + x] |= 1;
 				}
 			}
@@ -166,7 +161,6 @@ FilterableTable.prototype.attachFilter = function ()
 		}
 		this.filterObjects[j] = row;
 	}
-
 	// Fill the filters
 	this.fillFilters();
 	this.filterEnabled = true;
@@ -214,9 +208,9 @@ FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValu
 
 	// put all relevant strings in the values array.
 	for (var i = 0; i < this.tBody.children.length; i += this.step) {
-		var r = this.tBody.children[i];
+		var r = this.tBody.children[(this.bMultipleTHead ? i : i + rowIndex)];
 		if (r.style.display != 'none' && r.className != 'noFilter') {
-			values.push(this.getInnerText(r.children[filterObject.fullColumnIndex]));
+			values.push(this.getInnerText(r.children[this.bMultipleTHead ? filterObject.fullColumnIndex : columnIndex]));
 		}
 	}
 	values.sort();
@@ -264,7 +258,7 @@ FilterableTable.prototype.filter = function (e) {
 	var columnIndex = FilterableTable.safari
 		? FilterableTable.getCellIndex(sel.parentNode)
 		: sel.parentNode.cellIndex;
-	var rowIndex = sel.parentNode.parentNode.rowIndex - this.hrowCount;
+	var rowIndex = sel.parentNode.parentNode.rowIndex - (this.multipleTHead ? this.hrowCount : this.step);
 	var filterObject = this.filterObjects[rowIndex][columnIndex];
 
 	var filterText  = {};
@@ -299,7 +293,6 @@ FilterableTable.prototype.filter = function (e) {
 
 	// the filter ou the right rows.
 	var hideRows = {};
-
 	for (var rowIndex in this.filterObjects) {
 		var r = parseInt(rowIndex);
 		for (var columnIndex in this.filterObjects[rowIndex]) {
@@ -311,8 +304,8 @@ FilterableTable.prototype.filter = function (e) {
 			// Apply the filter
 			for (var i = 0; i < this.tBody.children.length; i += this.step) {
 				if (hideRows[i]) { continue; }
-				var row = this.tBody.children[i];
-				var cell = row.children[obj.fullColumnIndex];
+				var row = this.tBody.children[(this.bMultipleTHead ? i : i + r)];
+				var cell = row.children[(this.bMultipleTHead ? obj.fullColumnIndex : n)];
 				var text = this.getInnerText(cell).toLowerCase();
 				if (row.className != 'noFilter') {
 					if (obj.regexp) {
