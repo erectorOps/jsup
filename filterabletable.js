@@ -279,23 +279,15 @@ FilterableTable.prototype.filter = function (e) {
 		} else {
 			try {
 				if (filterObject.sortType.indexOf('Number') !== -1) {
-					compare = FilterableTable.compare_op['='];
-					let op = '';
-					for (let ci = 0; ci < sel.value.length; ci++) {
-						const c = sel.value[ci];
-						if (c == '<' || c == '>' || c == '=') {
-							op += c;
-						} else if (0 < op.length) {
-							if ((ci - op.length) == 0 && (op+'x' in FilterableTable.compare_op)) {
-								compare_value = parseFloat(sel.value.substring(op.length));
-								compare = FilterableTable.compare_op[op+'x'];
-								break;
-							}
-							else if ((ci - op.length) > 0 && ('x'+op in FilterableTable.compare_op)) {
-								compare_value = parseFloat(sel.value.substring(0, sel.value.indexOf(op)));
-								compare = FilterableTable.compare_op['x'+op];
-								break;
-							}
+					const opm = /([<>=]+)/.exec(sel.value);
+					if (opm) {
+						if (opm.index == 0 && (opm[0]+'x' in FilterableTable.compare_op)) {
+							compare_value = parseFloat(sel.value.substring(opm[0].length));
+							compare = FilterableTable.compare_op[opm[0]+'x'];
+						}
+						else if (0 < opm.index && ('x'+opm[0] in FilterableTable.compare_op)) {
+							compare_value = parseFloat(sel.value.substring(0, opm.index));
+							compare = FilterableTable.compare_op['x'+opm[0]];
 						}
 					}
 				}
