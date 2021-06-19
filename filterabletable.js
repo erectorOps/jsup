@@ -17,7 +17,7 @@ function FilterableTable(oTable, oSortTypes, bMultipleTHead)
 	this.table = oTable;
 	this.tHead = oTable.tHead;
 	this.tBody = oTable.tBodies[0];
-	this.bMultipleTHead = bMultipleTHead || false;
+	this.single = !(bMultipleTHead || false);
 	this.document = oTable.ownerDocument || oTable.document;
 	var oThis = this;
 	this._optChange = function (e) {
@@ -78,7 +78,7 @@ FilterableTable.prototype.attachFilter = function ()
 	// Insert the filterrow and add cells whith drowdowns.
 	this.filterRows = new Array();
 	this.hrowCount = this.tHead.rows.length;
-	this.step = this.bMultipleTHead ? 1 : this.hrowCount;
+	this.step = this.single ? 1 : this.hrowCount;
 	for (var i = 0; i < this.hrowCount; i++) {
 		this.filterRows[i] = this.tHead.insertRow(this.tHead.rows.length);
 	}
@@ -208,9 +208,9 @@ FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValu
 
 	// put all relevant strings in the values array.
 	for (var i = 0; i < this.tBody.children.length; i += this.step) {
-		var r = this.tBody.children[(this.bMultipleTHead ? i : i + rowIndex)];
+		var r = this.tBody.children[(this.single ? i : i + rowIndex)];
 		if (r.style.display != 'none' && r.className != 'noFilter') {
-			values.push(this.getInnerText(r.children[this.bMultipleTHead ? filterObject.fullColumnIndex : columnIndex]));
+			values.push(this.getInnerText(r.children[this.single ? filterObject.fullColumnIndex : columnIndex]));
 		}
 	}
 	values.sort();
@@ -258,7 +258,7 @@ FilterableTable.prototype.filter = function (e) {
 	var columnIndex = FilterableTable.safari
 		? FilterableTable.getCellIndex(sel.parentNode)
 		: sel.parentNode.cellIndex;
-	var rowIndex = sel.parentNode.parentNode.rowIndex - (this.bMultipleTHead ? this.hrowCount : this.step);
+	var rowIndex = sel.parentNode.parentNode.rowIndex - (this.single ? this.hrowCount : this.step);
 	var filterObject = this.filterObjects[rowIndex][columnIndex];
 
 	var filterText  = {};
@@ -304,8 +304,8 @@ FilterableTable.prototype.filter = function (e) {
 			// Apply the filter
 			for (var i = 0; i < this.tBody.children.length; i += this.step) {
 				if (hideRows[i]) { continue; }
-				var row = this.tBody.children[(this.bMultipleTHead ? i : i + r)];
-				var cell = row.children[(this.bMultipleTHead ? obj.fullColumnIndex : n)];
+				var row = this.tBody.children[(this.single ? i : i + r)];
+				var cell = row.children[(this.single ? obj.fullColumnIndex : n)];
 				var text = this.getInnerText(cell).toLowerCase();
 				if (row.className != 'noFilter') {
 					if (obj.regexp) {
