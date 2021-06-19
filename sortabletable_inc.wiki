@@ -6,18 +6,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   let sortabletable_main = function(table_id, table_html, sortabletableso, filter, multi) {
     table_html.attr('id', table_id);
-    let tableid = table_html[0];
+    let tblElem = table_html[0];
     if (multi) {
-      const merged = Array.prototype.slice.call(table_html.tBodies[0].rows)
+      const merged = Array.prototype.slice.call(tblElem.tBodies[0].rows)
         .flatMap(x => Array.prototype.slice.call(x.cells))
         .some(x => x.colSpan > 1 || x.rowSpan > 1);
       if (merged) {
         multi = true;
       }
     }
-    let st = new SortableTable(tableid, sortabletableso, multi);
+    let st = new SortableTable(tblElem, sortabletableso, multi);
     if (filter) {
-      let ft = new FilterableTable(tableid, sortabletableso, multi);
+      let ft = new FilterableTable(tblElem, sortabletableso, multi);
     }
   };
 
