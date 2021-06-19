@@ -156,7 +156,7 @@ FilterableTable.prototype.attachFilter = function ()
 			}
 
 			c.appendChild(opt);
-			row[i] = {columnIndex: i, rowIndex: j, opt: opt, text: text, filter: {}, regexp: false, enable: false, fullColumnIndex: fi};
+			row[i] = {columnIndex: i, rowIndex: j, opt: opt, text: text, filter: {}, regexp: false, enable: false, fullColumnIndex: fi, "sortType": sortType };
 			fi += c.colSpan;
 		}
 		this.filterObjects[j] = row;
@@ -263,6 +263,8 @@ FilterableTable.prototype.filter = function (e) {
 
 	var filterText  = {};
 	var regexp = false;
+	var compare = false;
+	var compare_value;
 	if (sel.options) {
 		for (var i = 0; i < sel.options.length; i++) {
 			filterText[sel.options[i].value] = sel.options[i].selected;
@@ -276,7 +278,30 @@ FilterableTable.prototype.filter = function (e) {
 			filterText['(all)'] = true;
 		} else {
 			try {
-				regexp = new RegExp(sel.value, 'i');
+				if (filterObject.sortType.indexOf('Number') !== -1) {
+					compare = FilterableTable.compare_op['='];
+					let op = '';
+					for (let ci = 0; ci < sel.value.length; ci++) {
+						const c = sel.value[ci];
+						if (c == '<' || c == '>' || c == '=') {
+							op += ci;
+						} else if (0 < op.length) {
+							if ((ci - op.length) == 0 && (op+'x' in FilterableTable.compare_op)) {
+								compare_value = parseFloat(sel.value.substring(op.length));
+								compare = FilterableTable.compare_op[op+'x'];
+								break;
+							}
+							else if ((ci - op.length) > 0 && ('x'+op in FilterableTable.compare_op)) {
+								compare_value = parseFloat(sel.value.substring(0, sel.value.indexOf(op)));
+								compare = FilterableTable.compare_op['x'+op];
+								break;
+							}
+						}
+					}
+				}
+				if (typeof compare_value === 'undefined') {
+					regexp = new RegExp(sel.value, 'i');
+				}
 			} catch (e) {
 				return;
 			}
@@ -287,6 +312,8 @@ FilterableTable.prototype.filter = function (e) {
 	filterObject.enable = (! filterText['(all)']);
 	filterObject.filter = filterText;
 	filterObject.regexp = regexp;
+	filterObject.compare = compare;
+	filterObject.value = compare_value;
 
 	// first set all rows to be displayed
 	this.showAll();
@@ -312,7 +339,13 @@ FilterableTable.prototype.filter = function (e) {
 						if (! text.match(obj.regexp)) {
 							hideRows[i] = true;
 						}
-					} else {
+					}
+					else if (obj.value) {
+						if (!obj.compare(obj.value, parseFloat(text))) {
+							hideRow[i] = true;
+						}
+					}
+					else {
 						if (! obj.filter[text]) {
 							hideRows[i] = true;
 						}
@@ -338,3 +371,15 @@ FilterableTable.prototype.showAll = function () {
 		this.tBody.rows[i].style.display = '';
 	}
 }
+
+FilterableTable.compare_op = {
+	'<=x' : function(a, b) { return a <= b; },
+	'<x'  : function(a, b) { return a < b; },
+	'>=x' : function(a, b) { return a >= b; },
+	'>x'  : function(a, b) { return a > b; },
+	'x<=' : function(a, b) { return b <= a},
+	'x<'  : function(a, b) { return b < a},
+	'x>=' : function(a, b) { return b >= a},
+	'x>'  : function(a, b) { return b > a},
+	'='  : function(a, b) { return a == b; }
+};
