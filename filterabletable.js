@@ -100,7 +100,7 @@ FilterableTable.prototype.attachFilter = function ()
 			var c = document.createElement('TH');
 			
 			for (var n = 0, len = cell.classList.length; n < len; n++) {
-n				if (cell.classList[n].indexOf('table_filter_') !== -1) {
+				if (cell.classList[n].indexOf('table_filter_') !== -1) {
 					c.className = cell.classList[n];
 					break;
 				}
