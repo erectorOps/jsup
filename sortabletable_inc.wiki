@@ -1,21 +1,23 @@
 #javascript(){{{
-<script defer charset="utf-8" type="text/javascript" src="https://img.atwikiimg.com/www65.atwiki.jp/myrenshu/pub/js/filterabletable.js"></script>
-<script defer charset="utf-8" type="text/javascript" src="https://img.atwikiimg.com/www65.atwiki.jp/myrenshu/pub/js/sortabletable.js"></script>
+<script defer charset="utf-8" type="text/javascript" src="https://erectorops.github.io/jsup/filterabletable.js?ver=20210619"></script>
+<script defer charset="utf-8" type="text/javascript" src="https://erectorops.github.io/jsup/sortabletable.js?ver=20210619"></script>
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
   
-  let sortabletable_main = function(table_id, table_html, sortabletableso, filter) {
+  let sortabletable_main = function(table_id, table_html, sortabletableso, filter, multi) {
     table_html.attr('id', table_id);
     let tableid = table_html[0];
-    let st = new SortableTable(tableid, sortabletableso);
+    let st = new SortableTable(tableid, sortabletableso, multi);
     if (filter) {
-      let ft = new FilterableTable(tableid);
+      let ft = new FilterableTable(tableid, sortabletableso, multi);
     }
   };
 
   // parse 'Sort' argument
   $('.sortabletable').each(function(index, element) {
-    let sortabletableso, filter, table_id;
+    let sortabletableso, table_id;
+    let filter = false;
+    let multi = false;
     let option = [];
     let args = $('.option:first', element);
     if (args.length !== 0) {
@@ -29,10 +31,10 @@ document.addEventListener('DOMContentLoaded', function() {
       sortabletableso = Array(cols).fill().map(x => "String");
     }
     
-    if (option.length >= 2 && option[1].trim() == '1') {
-      filter = 1;
-    } else {
-      filter = 0;
+    if (option.length >= 2) {
+      let mode = parseInt(option[1].trim()) || 0;
+      filter = mode & 1;
+      multi = mode & 2;
     }
     
     if (option.length >= 3 && option[2] !== "") {
