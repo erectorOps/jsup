@@ -61,7 +61,9 @@ FilterableTable.prototype.detachFilter = function ()
 
 	// Remove the filter
 	this.showAll();
-	this.tHead.removeChild(this.filterRows);
+	for (let row = 0; row < this.filterRows.length; row++) {
+		this.tHead.removeChild(this.filterRows[row]);
+	}
 	this.filterEnabled = false;
 }
 FilterableTable.prototype.attachFilter = function ()
@@ -280,9 +282,11 @@ FilterableTable.prototype.filter = function (e) {
 	// the filter ou the right rows.
 	var hideRows = {};
 
-		for (var columnIndex in this.filterObjects) {
+	for (var rowIndex in this.filterObjects) {
+		var r = parseInt(rowIndex);
+		for (var columnIndex in this.filterObjects[rowIndex]) {
 			var n = parseInt(columnIndex);
-			var obj = this.filterObjects[columnIndex];
+			var obj = this.filterObjects[rowIndex][columnIndex];
 			if (! obj.enable) { continue; }
 			// First fill the select box for this column
 			this.buildFilter(obj.rowIndex, obj.columnIndex, obj.filter);
@@ -304,7 +308,7 @@ FilterableTable.prototype.filter = function (e) {
 					}
 				}
 			}
-		
+		}
 	}
 
 	for (var i in hideRows) {
