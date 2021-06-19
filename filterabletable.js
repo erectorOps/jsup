@@ -98,6 +98,7 @@ FilterableTable.prototype.attachFilter = function ()
 	for (var j = 0; j < this.hrowCount; j++) {
 		var row = new Array();
 		for (var i = 0, fi = 0; i < this.tHead.rows[j].cells.length; i++) {
+			for (; fi < fullColumnCount && spanFlag[j][fi] !== 0; fi++) ;
       var sortType = this.sortTypes[index++] || 'None';
 			var cell = this.tHead.rows[j].cells[i];
 			var c = document.createElement('TH');
