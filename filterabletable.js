@@ -109,6 +109,7 @@ FilterableTable.prototype.attachFilter = function ()
 
 			c.rowSpan = cell.rowSpan;
 			c.colSpan = cell.colSpan;
+			this.filterRows[j].appendChild(c);
 
 			if (sortType === 'None') {
 				continue;
