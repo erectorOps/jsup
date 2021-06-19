@@ -279,7 +279,7 @@ FilterableTable.prototype.filter = function (e) {
 		} else {
 			try {
 				if (filterObject.sortType.indexOf('Number') !== -1) {
-					const opm = /([<>=]+)/.exec(sel.value);
+					const opm = /([<>=!]+)/.exec(sel.value);
 					if (opm) {
 						if (opm.index == 0 && (opm[0]+'x' in FilterableTable.compare_op)) {
 							compare_value = parseFloat(sel.value.substring(opm[0].length));
@@ -373,5 +373,8 @@ FilterableTable.compare_op = {
 	'x<'  : function(a, b) { return b < a},
 	'x>=' : function(a, b) { return b >= a},
 	'x>'  : function(a, b) { return b > a},
-	'='  : function(a, b) { return a == b; }
+	'x='  : function(a, b) { return a == b; },
+	'=x'  : function(a, b) { return a == b; },
+	'x!'  : function(a, b) { return a != b; },
+	'!x'  : function(a, b) { return a != b; }
 };
