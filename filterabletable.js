@@ -79,37 +79,47 @@ FilterableTable.prototype.attachFilter = function ()
 	
 	this.filterObjects = new Array();
 	let index = 0;
+
+	const splittedColumnCount = Array.prototype.slice.call(this.tHead.rows[0].cells).map(x => x.colSpan).reduce((a, c) => a + c);
+	const tmpTh = new Array(splittedColumnCount);
+	const flags = new Array(this.tHead.rows.length);
+
+	for (var i = 0; i < flags.length; i++) { flags[i] = new Array(splittedColumnCount); flags[i].fill(0); }
+
+	// 2行目のcolspanが1行目のrowspanの影響を受けるのでflagで管理
+
 	for (var j = 0; j < this.tHead.rows.length; j++) {
 		var row = new Array();
-		for (var i = 0; i < this.tHead.rows[j].cells.length; i++) {
+		for (var i = 0, i2 = 0; i < this.tHead.rows[j].cells.length; i++) {
+
       let sortType = this.sortTypes[index++] || 'None';
+			for (; flags[j][i2] == 1 && i2 < flags[j].length ; i2++) ;
 			var cell = this.tHead.rows[j].cells[i];
 
-			if (j == 0) {
-				var c = document.createElement('TH');
-				
-				for (let n = 0, len = cell.classList.length; n < len; n++) {
-					if (cell.classList[n].indexOf('table_filter_') !== -1) {
-						c.className = cell.classList[n];
-						break;
-					}
-				}
-				if (cell.style.display) {
-					c.style.display = cell.style.display;
-				}
-				
-				
-				c.rowSpan = cell.rowSpan;
-				c.colSpan = cell.colSpan;
-
-				this.filterRows.appendChild(c);
-			}
-			
-			if (sortType === 'None' || this.filterObjects[i]) {
+			if (sortType === 'None' || this.filterObjects[i2]) {
 			  continue;
 			}
 
-			var c = this.filterRows.children[i];
+			var c = document.createElement('TH');
+				
+			for (let n = 0, len = cell.classList.length; n < len; n++) {
+				if (cell.classList[n].indexOf('table_filter_') !== -1) {
+					c.className = cell.classList[n];
+					break;
+				}
+			}
+			if (cell.style.display) {
+				c.style.display = cell.style.display;
+			}
+
+			c.rowSpan = cell.rowSpan;
+			c.colSpan = cell.colSpan;
+
+			for (let y = 0; y < c.rowSpan; y++) {
+				for (let x = 0; x < c.colSpan; x++) {
+					flags[j + y][i2 + x] |= 1;
+				}
+			}
 
 
 			var text = document.createElement('INPUT');
@@ -143,9 +153,19 @@ FilterableTable.prototype.attachFilter = function ()
 			}
 
 			c.appendChild(opt);
-			this.filterObjects[i] = {columnIndex: i, rowIndex: j, opt: opt, text: text, filter: {}, regexp: false, enable: false};
+			this.filterObjects[i2] = {columnIndex: i, rowIndex: j, opt: opt, text: text, filter: {}, regexp: false, enable: false};
+			tmpTh[i2] = c;
+
+			i2 += c.colSpan;
 		}
 	}
+
+	for (var i in tmpTh)
+	{
+		if (tmpTh[i])
+			this.filterRows.appendChild(tmpTh[i]);
+	}
+
 	// Fill the filters
 	this.fillFilters();
 	this.filterEnabled = true;
