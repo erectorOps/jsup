@@ -365,14 +365,14 @@ FilterableTable.prototype.showAll = function () {
 }
 
 FilterableTable.compare_op = {
-	'<=x' : function(a, b) { return a <= b; },
-	'<x'  : function(a, b) { return a < b; },
-	'>=x' : function(a, b) { return a >= b; },
-	'>x'  : function(a, b) { return a > b; },
-	'x<=' : function(a, b) { return b <= a},
-	'x<'  : function(a, b) { return b < a},
-	'x>=' : function(a, b) { return b >= a},
-	'x>'  : function(a, b) { return b > a},
+	'<=x' : function(a, b) { return b <= a; },
+	'<x'  : function(a, b) { return b < a; },
+	'>=x' : function(a, b) { return b >= a; },
+	'>x'  : function(a, b) { return b > a; },
+	'x<=' : function(a, b) { return a <= b},
+	'x<'  : function(a, b) { return a < b},
+	'x>=' : function(a, b) { return a >= b},
+	'x>'  : function(a, b) { return a > b},
 	'x='  : function(a, b) { return a == b; },
 	'=x'  : function(a, b) { return a == b; },
 	'x!'  : function(a, b) { return a != b; },
