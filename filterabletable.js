@@ -258,7 +258,7 @@ FilterableTable.prototype.filter = function (e) {
 	var columnIndex = FilterableTable.safari
 		? FilterableTable.getCellIndex(sel.parentNode)
 		: sel.parentNode.cellIndex;
-	var rowIndex = sel.parentNode.parentNode.rowIndex - (this.multipleTHead ? this.hrowCount : this.step);
+	var rowIndex = sel.parentNode.parentNode.rowIndex - (this.bMultipleTHead ? this.hrowCount : this.step);
 	var filterObject = this.filterObjects[rowIndex][columnIndex];
 
 	var filterText  = {};
