@@ -91,10 +91,6 @@ FilterableTable.prototype.attachFilter = function ()
       let sortType = this.sortTypes[index++] || 'None';
 			var cell = this.tHead.rows[j].cells[i];
 
-			if (sortType === 'None' || this.filterObjects[i2]) {
-			  continue;
-			}
-
 			var c = document.createElement('TH');
 				
 			for (let n = 0, len = cell.classList.length; n < len; n++) {
