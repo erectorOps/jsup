@@ -45,10 +45,10 @@
 \----------------------------------------------------------------------------*/
 
 
-function SortableTable(oTable, oSortTypes) {
+function SortableTable(oTable, oSortTypes, bMultipleTHead) {
 
 	this.sortTypes = oSortTypes || [];
-
+	this.bMultipleTHead = bMultipleTHead || false;
 	this.sortColumn = null;
 	this.sortRow = null;
 	this.descending = null;
@@ -105,7 +105,7 @@ SortableTable.prototype.setTHead = function (oTHead) {
 	if (this.tHead && this.tHead != oTHead )
 		this.uninitHeader();
 	this.tHead = oTHead;
-	this.step = 1;
+	this.step = this.bMultipleTHead ? 1 : oTHead.rows.length;
 	this.initHeader( this.sortTypes );
 };
 
@@ -299,8 +299,7 @@ SortableTable.prototype.getCache = function (sType, nRow, nColumn) {
 		var r = [];
 		for (var j = 0; j < this.step; j++) { r.push(rows[i + j]); }
 		a.push({
-			
-			value:		this.getRowValue(r[0], sType, nColumn),
+			value:		this.getRowValue(r[(this.bMultipleTHead ? 0 : nRow)], sType, nColumn),
 			elements:	r
 		});
 	};
