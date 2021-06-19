@@ -75,25 +75,20 @@ FilterableTable.prototype.attachFilter = function ()
 	// Insert the filterrow and add cells whith drowdowns.
 
 	this.step = 1;
-	this.filterRows = this.tHead.insertRow(this.tHead.rows.length);
-	
+	this.hrowCount = this.tHead.rows.length;
+	this.filterRows = new Array();
+	for (let i = 0; i < this.hrowCount; i++) {
+		this.filterRows[i] = this.tHead.insertRow(this.tHead.rows.length);
+	}
+
 	this.filterObjects = new Array();
 	let index = 0;
 
-	const splittedColumnCount = Array.prototype.slice.call(this.tHead.rows[0].cells).map(x => x.colSpan).reduce((a, c) => a + c);
-	const tmpTh = new Array(splittedColumnCount);
-	const flags = new Array(this.tHead.rows.length);
-
-	for (var i = 0; i < flags.length; i++) { flags[i] = new Array(splittedColumnCount); flags[i].fill(0); }
-
-	// 2行目のcolspanが1行目のrowspanの影響を受けるのでflagで管理
-
-	for (var j = 0; j < this.tHead.rows.length; j++) {
+	for (var j = 0; j < this.hrowCount; j++) {
 		var row = new Array();
 		for (var i = 0, i2 = 0; i < this.tHead.rows[j].cells.length; i++) {
 
       let sortType = this.sortTypes[index++] || 'None';
-			for (; flags[j][i2] == 1 && i2 < flags[j].length ; i2++) ;
 			var cell = this.tHead.rows[j].cells[i];
 
 			if (sortType === 'None' || this.filterObjects[i2]) {
@@ -115,12 +110,9 @@ FilterableTable.prototype.attachFilter = function ()
 			c.rowSpan = cell.rowSpan;
 			c.colSpan = cell.colSpan;
 
-			for (let y = 0; y < c.rowSpan; y++) {
-				for (let x = 0; x < c.colSpan; x++) {
-					flags[j + y][i2 + x] |= 1;
-				}
+			if (sortType === 'None') {
+				continue;
 			}
-
 
 			var text = document.createElement('INPUT');
 			text.className = 'filter-box';
@@ -153,17 +145,9 @@ FilterableTable.prototype.attachFilter = function ()
 			}
 
 			c.appendChild(opt);
-			this.filterObjects[i2] = {columnIndex: i, rowIndex: j, opt: opt, text: text, filter: {}, regexp: false, enable: false};
-			tmpTh[i2] = c;
-
-			i2 += c.colSpan;
+			row[i] = {columnIndex: i, rowIndex: j, opt: opt, text: text, filter: {}, regexp: false, enable: false};
 		}
-	}
-
-	for (var i in tmpTh)
-	{
-		if (tmpTh[i])
-			this.filterRows.appendChild(tmpTh[i]);
+		this.filterObjects[j] = row;
 	}
 
 	// Fill the filters
@@ -173,20 +157,21 @@ FilterableTable.prototype.attachFilter = function ()
 // Checks if a column is filtered
 FilterableTable.prototype.inFilter = function (row, column)
 {
-	return this.filterObjects[column].enable;
+	return this.filterObjects[row][column].enable;
 }
 FilterableTable.prototype.hasFilter = function(row, column)
 {
-  return typeof this.filterObjects[column] !== 'undefined';
+  return typeof this.filterObjects[row][column] !== 'undefined';
 }
 
 // Fills the filters for columns which are not fiiltered
 FilterableTable.prototype.fillFilters = function ()
 {
-	var row = 0;
-	for (var column = 0; column < this.filterRows.cells.length; column++) {
-		if (this.hasFilter(row, column) && !this.inFilter(row, column)) {
-			this.buildFilter(row, column, {'(all)':true});
+	for (var row = 0; row < this.filterRows.length; row++) {
+		for (var column = 0; column < this.filterRows[row].cells.length; column++) {
+			if (this.hasFilter(row, column) && !this.inFilter(row, column)) {
+				this.buildFilter(row, column, {'(all)':true});
+			}
 		}
 	}
 }
@@ -197,7 +182,7 @@ FilterableTable.prototype.fillFilters = function ()
 FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValue)
 {
 	// Get a reference to the selectbox.
-	var filterObject = this.filterObjects[columnIndex];
+	var filterObject = this.filterObjects[rowIndex][columnIndex];
 	var opt = filterObject.opt;
 
 	// remove all existing items
@@ -262,8 +247,8 @@ FilterableTable.prototype.filter = function (e) {
 	var columnIndex = FilterableTable.safari
 		? FilterableTable.getCellIndex(sel.parentNode)
 		: sel.parentNode.cellIndex;
-	var rowIndex = sel.parentNode.parentNode.rowIndex - this.step;
-	var filterObject = this.filterObjects[columnIndex];
+	var rowIndex = sel.parentNode.parentNode.rowIndex - this.hrowCount;
+	var filterObject = this.filterObjects[rowIndex][columnIndex];
 
 	var filterText  = {};
 	var regexp = false;
