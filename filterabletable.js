@@ -333,7 +333,7 @@ FilterableTable.prototype.filter = function (e) {
 						}
 					}
 					else if (obj.value) {
-						if (!obj.compare(obj.value, parseFloat(text))) {
+						if (!obj.compare(obj.value, parseFloat(text.split(',').join('')))) {
 							hideRows[i] = true;
 						}
 					}
