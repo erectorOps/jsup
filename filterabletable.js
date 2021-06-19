@@ -291,7 +291,7 @@ FilterableTable.prototype.filter = function (e) {
 						}
 					}
 				}
-				if (typeof compare_value === 'undefined') {
+				if (!compare) {
 					regexp = new RegExp(sel.value, 'i');
 				}
 			} catch (e) {
@@ -332,7 +332,7 @@ FilterableTable.prototype.filter = function (e) {
 							hideRows[i] = true;
 						}
 					}
-					else if (obj.value) {
+					else if (obj.compare) {
 						if (!obj.compare(obj.value, parseFloat(text.split(',').join('')))) {
 							hideRows[i] = true;
 						}
