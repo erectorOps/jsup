@@ -146,6 +146,7 @@ FilterableTable.prototype.attachFilter = function ()
 			var opt = document.createElement('SELECT');
 			opt.size = 5;
 			opt.multiple = true;
+			opt.style["max-width"] = cell.offsetWidth + "px";
 
 			if (typeof opt.addEventListener != 'undefined') {
 				opt.addEventListener('change', this._optChange, false);
