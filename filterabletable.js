@@ -218,12 +218,23 @@ FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValu
 	//add each unique string to the selectbox
 	var value = '';
 	for (var i = 0; i < values.length; i++) {
-		if (values[i].toLowerCase() != value) {
-			value = values[i].toLowerCase();
-			var option = new Option(values[i], value);
-			if (setValue[value]) { option.selected = true; }
-			opt.options[opt.options.length] = option;
-//			opt.options.add(option);
+		if (filterObject.sortType === 'CaseInsensitiveString')
+		{
+			if (values[i] != value) {
+				value = values[i];
+				var option = new Option(values[i], value);
+				if (setValue[value]) { option.selected = true; }
+				opt.options[opt.options.length] = option;
+	//			opt.options.add(option);
+			}
+		} else {
+			if (values[i].toLowerCase() != value) {
+				value = values[i].toLowerCase();
+				var option = new Option(values[i], value);
+				if (setValue[value]) { option.selected = true; }
+				opt.options[opt.options.length] = option;
+	//			opt.options.add(option);
+			}
 		}
 	}
 }

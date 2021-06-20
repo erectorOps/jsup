@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let sortabletable_main = function(table_id, table_html, sortabletableso, filter, multi) {
     table_html.attr('id', table_id);
     let tblElem = table_html[0];
-    if (multi) {
+    if (!multi) {
       const merged = Array.prototype.slice.call(tblElem.tBodies[0].rows)
         .flatMap(x => Array.prototype.slice.call(x.cells))
         .some(x => x.colSpan > 1 || x.rowSpan > 1);
