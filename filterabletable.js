@@ -210,7 +210,12 @@ FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValu
 	for (var i = 0; i < this.tBody.children.length; i += this.step) {
 		var r = this.tBody.children[(this.single ? i : i + rowIndex)];
 		if (r.style.display != 'none' && r.className != 'noFilter') {
-			values.push(this.getInnerText(r.children[this.single ? filterObject.fullColumnIndex : columnIndex]));
+			var raw = this.getInnerText(r.children[this.single ? filterObject.fullColumnIndex : columnIndex]);
+			if (filterObject.sortType === 'CaseInsensitiveString') {
+				values.push(raw);
+			} else {
+				values.push(raw.toLowerCase());
+			}
 		}
 	}
 	values.sort();
@@ -336,6 +341,7 @@ FilterableTable.prototype.filter = function (e) {
 				if (hideRows[i]) { continue; }
 				var row = this.tBody.children[(this.single ? i : i + r)];
 				var cell = row.children[(this.single ? obj.fullColumnIndex : n)];
+
 				var text = this.getInnerText(cell).toLowerCase();
 				if (row.className != 'noFilter') {
 					if (obj.regexp) {
