@@ -342,7 +342,8 @@ FilterableTable.prototype.filter = function (e) {
 				var row = this.tBody.children[(this.single ? i : i + r)];
 				var cell = row.children[(this.single ? obj.fullColumnIndex : n)];
 
-				var text = this.getInnerText(cell).toLowerCase();
+				var text = this.getInnerText(cell);
+				if (obj.sortType !== 'CaseInsensitiveString') { text = text.toLowerCase(); }
 				if (row.className != 'noFilter') {
 					if (obj.regexp) {
 						if (! text.match(obj.regexp)) {
