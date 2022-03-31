@@ -359,8 +359,9 @@ FilterableTable.prototype.filter = function (e) {
 				var row = this.tBody.children[(this.single ? i : i + r)];
 				var cell = row.children[(this.single ? obj.fullColumnIndex : n)];
 
-				var text = this.getInnerText(cell);
-				if (obj.sortType !== 'CaseInsensitiveString') { text = text.toLowerCase(); }
+				var lines = this.getInnerLines(cell);
+				if (obj.sortType !== 'CaseInsensitiveString') { lines = lines.map(x => x.toLowerCase()); }
+				var text = lines.join('');
 				if (row.className != 'noFilter') {
 					if (obj.regexp) {
 						if (! text.match(obj.regexp)) {
@@ -373,7 +374,8 @@ FilterableTable.prototype.filter = function (e) {
 						}
 					}
 					else {
-						if (! obj.filter[text]) {
+						if (! lines.some((x) => obj.filter[x])) {
+						//if (! obj.filter[text]) {
 							hideRows[i] = true;
 						}
 					}
