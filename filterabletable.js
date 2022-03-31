@@ -213,11 +213,13 @@ FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValu
 	for (var i = 0; i < this.tBody.children.length; i += this.step) {
 		var r = this.tBody.children[(this.single ? i : i + rowIndex)];
 		if (r.style.display != 'none' && r.className != 'noFilter') {
-			var raw = this.getInnerText(r.children[this.single ? filterObject.fullColumnIndex : columnIndex]);
-			if (filterObject.sortType === 'CaseInsensitiveString') {
-				values.push(raw);
-			} else {
-				values.push(raw.toLowerCase());
+			var raws = this.getInnerLines(r.children[this.single ? filterObject.fullColumnIndex : columnIndex]);
+			for (var j = 0; j < raws.length; j++) {
+				if (filterObject.sortType === 'CaseInsensitiveString') {
+					values.push(raws[j]);
+				} else {
+					values.push(raws[j].toLowerCase());
+				}
 			}
 		}
 	}
@@ -246,7 +248,7 @@ FilterableTable.prototype.buildFilter = function (rowIndex, columnIndex, setValu
 		}
 	}
 }
-FilterableTable.prototype.getInnerText = function (oNode)
+FilterableTable.prototype._getInnerText = function (oNode)
 {
 	var s = '';
 	var cs = oNode.childNodes;
@@ -255,7 +257,11 @@ FilterableTable.prototype.getInnerText = function (oNode)
 		if (cs[i].style && cs[i].style.display == 'none') { continue; }
 		switch (cs[i].nodeType) {
 			case 1: //ELEMENT_NODE
-				s += this.getInnerText(cs[i]);
+				if (cs[i].tagName === 'BR') {
+					s += '\n';
+				} else {
+					s += this.getInnerText(cs[i]);
+				}
 				break;
 			case 3:	//TEXT_NODE
 				s += cs[i].nodeValue.trim('\n');
@@ -263,6 +269,14 @@ FilterableTable.prototype.getInnerText = function (oNode)
 		}
 	}
 	return s;
+}
+FilterableTable.prototype.getInnerText = function(oNode)
+{
+	return this._getInnerText(oNode).split('\n').join('');
+}
+FilterableTable.prototype.getInnerLines = function (oNode)
+{
+	return this._getInnerText(oNode).split('\n');
 }
 FilterableTable.getCellIndex = function (cell) {
 	var cells = cell.parentNode.childNodes;
